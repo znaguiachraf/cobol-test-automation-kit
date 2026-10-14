@@ -1,0 +1,147 @@
+*> ----------------------------------------------------------------
+*> PREMCALC - SYNTHETIC motor-insurance premium calculator.
+*> Demo code only: the business rules below are invented for the
+*> COBOL Test Automation Kit and do not represent any real insurer.
+*>
+*> Source format: FREE (compile with: cobc -x -free)
+*>
+*> Interface (stdin -> stdout):
+*>   Input : ONE line, three comma-separated integers, no spaces
+*>           AGE,VEHICLE-VALUE,CLAIMS
+*>             AGE            18..99
+*>             VEHICLE-VALUE  1000..200000 (whole currency units)
+*>             CLAIMS         0..9 (claims in the last 5 years)
+*>   Output: ONE line
+*>     RESULT=OK PREMIUM=<amount, 2 decimals>     exit code 0
+*>     RESULT=DECLINED REASON=TOO-MANY-CLAIMS     exit code 0
+*>     RESULT=ERROR CODE=<Enn> MSG=<text>         exit code 4
+*>
+*> Rules:
+*>   AGE FACTOR : 18-24 -> 1.50, 25-64 -> 1.00, 65-99 -> 1.20
+*>   PREMIUM    = (300 + VEHICLE-VALUE * 0.02) * AGE FACTOR
+*>                * (1 + 0.10 * CLAIMS), rounded to 2 decimals
+*>   CLAIMS > 5 : application declined
+*> ----------------------------------------------------------------
+IDENTIFICATION DIVISION.
+PROGRAM-ID. PREMCALC.
+
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 WS-INPUT-LINE          PIC X(80).
+01 WS-AGE-TXT             PIC X(10).
+01 WS-VALUE-TXT           PIC X(10).
+01 WS-CLAIMS-TXT          PIC X(10).
+01 WS-EXTRA-TXT           PIC X(10).
+01 WS-AGE-LEN             PIC 99.
+01 WS-VALUE-LEN           PIC 99.
+01 WS-CLAIMS-LEN          PIC 99.
+01 WS-EXTRA-LEN           PIC 99.
+01 WS-AGE                 PIC 9(3).
+01 WS-VALUE               PIC 9(7).
+01 WS-CLAIMS              PIC 9(2).
+01 WS-AGE-FACTOR          PIC 9V99.
+01 WS-PREMIUM             PIC 9(7)V99.
+01 WS-PREMIUM-OUT         PIC Z(6)9.99.
+01 WS-ERROR-CODE          PIC X(3).
+01 WS-ERROR-MSG           PIC X(50).
+01 WS-VALID-FLAG          PIC X VALUE "Y".
+   88 INPUT-VALID         VALUE "Y".
+   88 INPUT-INVALID       VALUE "N".
+
+PROCEDURE DIVISION.
+MAIN-PARA.
+    MOVE SPACES TO WS-INPUT-LINE
+    ACCEPT WS-INPUT-LINE
+    PERFORM PARSE-INPUT
+    IF INPUT-VALID
+        PERFORM VALIDATE-INPUT
+    END-IF
+    IF INPUT-INVALID
+        DISPLAY "RESULT=ERROR CODE=" WS-ERROR-CODE
+                " MSG=" FUNCTION TRIM(WS-ERROR-MSG)
+        MOVE 4 TO RETURN-CODE
+        STOP RUN
+    END-IF
+    IF WS-CLAIMS > 5
+        DISPLAY "RESULT=DECLINED REASON=TOO-MANY-CLAIMS"
+        MOVE 0 TO RETURN-CODE
+        STOP RUN
+    END-IF
+    PERFORM CALCULATE-PREMIUM
+    MOVE WS-PREMIUM TO WS-PREMIUM-OUT
+    DISPLAY "RESULT=OK PREMIUM=" FUNCTION TRIM(WS-PREMIUM-OUT)
+    MOVE 0 TO RETURN-CODE
+    STOP RUN.
+
+PARSE-INPUT.
+    MOVE 0 TO WS-AGE-LEN WS-VALUE-LEN WS-CLAIMS-LEN WS-EXTRA-LEN
+    UNSTRING WS-INPUT-LINE DELIMITED BY "," OR ALL SPACE
+        INTO WS-AGE-TXT    COUNT IN WS-AGE-LEN
+             WS-VALUE-TXT  COUNT IN WS-VALUE-LEN
+             WS-CLAIMS-TXT COUNT IN WS-CLAIMS-LEN
+             WS-EXTRA-TXT  COUNT IN WS-EXTRA-LEN
+    END-UNSTRING
+    IF WS-AGE-LEN = 0 OR WS-VALUE-LEN = 0 OR WS-CLAIMS-LEN = 0
+       OR WS-EXTRA-LEN > 0
+        MOVE "E01" TO WS-ERROR-CODE
+        MOVE "EXPECTED 3 COMMA-SEPARATED FIELDS" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+    END-IF.
+
+VALIDATE-INPUT.
+    IF WS-AGE-LEN > 3
+       OR WS-AGE-TXT(1:WS-AGE-LEN) IS NOT NUMERIC
+        MOVE "E02" TO WS-ERROR-CODE
+        MOVE "AGE MUST BE A NUMBER" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+        EXIT PARAGRAPH
+    END-IF
+    COMPUTE WS-AGE = FUNCTION NUMVAL(WS-AGE-TXT(1:WS-AGE-LEN))
+    IF WS-AGE < 18 OR WS-AGE > 99
+        MOVE "E03" TO WS-ERROR-CODE
+        MOVE "AGE OUT OF RANGE 18-99" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+        EXIT PARAGRAPH
+    END-IF
+
+    IF WS-VALUE-LEN > 7
+       OR WS-VALUE-TXT(1:WS-VALUE-LEN) IS NOT NUMERIC
+        MOVE "E04" TO WS-ERROR-CODE
+        MOVE "VEHICLE VALUE MUST BE A NUMBER" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+        EXIT PARAGRAPH
+    END-IF
+    COMPUTE WS-VALUE = FUNCTION NUMVAL(WS-VALUE-TXT(1:WS-VALUE-LEN))
+    IF WS-VALUE < 1000 OR WS-VALUE > 200000
+        MOVE "E05" TO WS-ERROR-CODE
+        MOVE "VEHICLE VALUE OUT OF RANGE 1000-200000" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+        EXIT PARAGRAPH
+    END-IF
+
+    IF WS-CLAIMS-LEN > 2
+       OR WS-CLAIMS-TXT(1:WS-CLAIMS-LEN) IS NOT NUMERIC
+        MOVE "E06" TO WS-ERROR-CODE
+        MOVE "CLAIMS MUST BE A NUMBER" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+        EXIT PARAGRAPH
+    END-IF
+    COMPUTE WS-CLAIMS = FUNCTION NUMVAL(WS-CLAIMS-TXT(1:WS-CLAIMS-LEN))
+    IF WS-CLAIMS > 9
+        MOVE "E07" TO WS-ERROR-CODE
+        MOVE "CLAIMS OUT OF RANGE 0-9" TO WS-ERROR-MSG
+        SET INPUT-INVALID TO TRUE
+    END-IF.
+
+CALCULATE-PREMIUM.
+    EVALUATE TRUE
+        WHEN WS-AGE < 25
+            MOVE 1.50 TO WS-AGE-FACTOR
+        WHEN WS-AGE < 65
+            MOVE 1.00 TO WS-AGE-FACTOR
+        WHEN OTHER
+            MOVE 1.20 TO WS-AGE-FACTOR
+    END-EVALUATE
+    COMPUTE WS-PREMIUM ROUNDED =
+        (300 + WS-VALUE * 0.02) * WS-AGE-FACTOR
+        * (1 + 0.10 * WS-CLAIMS).

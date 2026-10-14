@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Results - COBOL Test Automation Kit</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">COBOL Test Automation Kit <span>local developer tool</span></div>
+    <nav class="nav" aria-label="Main">
+      <a href="/config">Configuration</a>
+      <a href="/results" aria-current="page">Results</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Results</h1>
+    <p class="lead">Every value below comes from the recorded run: process exit codes, captured output and test comparisons.</p>
+
+    <div id="page-message" hidden></div>
+    <div id="progress" class="msg info" role="status" aria-live="polite" hidden></div>
+
+    <div class="layout results">
+      <div>
+        <section class="card" id="run-card" aria-labelledby="run-title" hidden>
+          <div class="runhead">
+            <div>
+              <h2 id="run-title">Run <code id="run-id"></code></h2>
+              <div id="run-status"></div>
+            </div>
+            <div class="actions">
+              <a class="button primary" id="report-link" target="_blank" rel="noopener">Open HTML report</a>
+              <button type="button" id="rerun-btn">Run again</button>
+              <a class="button" href="/config">Edit configuration</a>
+            </div>
+          </div>
+          <dl class="meta" id="run-meta"></dl>
+          <div class="tiles" id="tiles"></div>
+          <div id="notes"></div>
+        </section>
+
+        <section class="card" id="build-card" aria-labelledby="build-title" hidden>
+          <h2 id="build-title">Compilation</h2>
+          <dl class="meta" id="build-meta"></dl>
+          <div id="build-logs"></div>
+        </section>
+
+        <section class="card" id="tests-card" aria-labelledby="tests-title" hidden>
+          <h2 id="tests-title">Test cases</h2>
+          <div class="tablewrap">
+            <table>
+              <thead>
+                <tr><th scope="col">ID</th><th scope="col">Description</th><th scope="col">Expected</th>
+                  <th scope="col">Actual</th><th scope="col">Status</th><th scope="col">Time</th></tr>
+              </thead>
+              <tbody id="tests-body"></tbody>
+            </table>
+          </div>
+          <div id="test-logs"></div>
+        </section>
+
+        <section class="card" id="empty-card" hidden>
+          <h2>No runs yet</h2>
+          <p class="empty">Start a run to see compilation and test results here.</p>
+          <div class="actions">
+            <button type="button" class="primary" id="first-run-btn">Run tests now</button>
+            <a class="button" href="/config">Check configuration first</a>
+          </div>
+        </section>
+      </div>
+
+      <aside class="card" aria-labelledby="history-title">
+        <h2 id="history-title">Run history</h2>
+        <ul class="history" id="history"></ul>
+      </aside>
+    </div>
+  </main>
+  <script src="/static/common.js"></script>
+  <script src="/static/results.js"></script>
+</body>
+</html>

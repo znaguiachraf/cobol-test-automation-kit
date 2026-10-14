@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting Started - COBOL Test Automation Kit</title>
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #eef1f5; --fg: #1b2230; --muted: #5b6577;
+  --line: #d8dee8; --accent: #0b5cad; --accent-soft: #e3eefa; --code-bg: #f0f3f7;
+  --ok: #116329; --ok-bg: #dafbe1; --bad: #a40e26; --bad-bg: #ffe1e4; --warn: #7a4d00; --warn-bg: #fff1c2;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f141b; --surface: #161c25; --surface-2: #1d2530; --fg: #e4e9f0; --muted: #98a3b4;
+    --line: #2c3644; --accent: #6aaef0; --accent-soft: #15283d; --code-bg: #1b222c;
+    --ok: #6fdd8b; --ok-bg: #12301c; --bad: #ff8c99; --bad-bg: #3d1219; --warn: #f2c35b; --warn-bg: #362a0c;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 40px; }
+@media (max-width: 860px) { .wrap { grid-template-columns: 1fr; gap: 0; } nav.toc { display: none; } }
+
+header.hero { background: var(--surface); border-bottom: 1px solid var(--line); padding: 40px 0 32px; margin-bottom: 32px; }
+header.hero .inner { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+.eyebrow { color: var(--accent); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+h1 { font-size: 32px; line-height: 1.2; margin: 6px 0 10px; }
+.lede { color: var(--muted); max-width: 720px; margin: 0; font-size: 16px; }
+.quick { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; color: var(--muted); }
+
+nav.toc { position: sticky; top: 20px; align-self: start; font-size: 14px; }
+nav.toc p { font-weight: 700; margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+nav.toc li a { display: block; padding: 5px 10px; border-left: 2px solid var(--line); color: var(--muted); text-decoration: none; }
+nav.toc li a:hover { color: var(--fg); border-left-color: var(--accent); }
+
+main { min-width: 0; padding-bottom: 60px; }
+section { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px 26px; margin-bottom: 22px; scroll-margin-top: 16px; }
+h2 { font-size: 21px; margin: 0 0 4px; display: flex; align-items: center; gap: 12px; }
+.num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--surface);
+  display: inline-grid; place-items: center; font-size: 14px; font-weight: 700; }
+h3 { font-size: 16px; margin: 22px 0 6px; }
+.sub { color: var(--muted); margin: 0 0 16px; }
+p { margin: 10px 0; }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+
+.code { position: relative; margin: 12px 0; }
+.code pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px;
+  overflow-x: auto; font: 13px/1.55 var(--mono); }
+.code .label { position: absolute; top: -9px; left: 12px; background: var(--surface); color: var(--muted); font-size: 11px;
+  padding: 0 6px; font-weight: 600; letter-spacing: .03em; }
+.copy { position: absolute; top: 8px; right: 8px; font: 600 12px/1 inherit; font-family: inherit; padding: 6px 10px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cmt { color: var(--muted); }
+
+.callout { border-radius: 8px; padding: 12px 16px; margin: 14px 0; border-left: 4px solid; }
+.callout.tip { background: var(--accent-soft); border-color: var(--accent); }
+.callout.ok { background: var(--ok-bg); border-color: var(--ok); }
+.callout.warn { background: var(--warn-bg); border-color: var(--warn); }
+.callout b:first-child { display: block; margin-bottom: 2px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { background: var(--surface-2); font-size: 12.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0 6px; }
+@media (max-width: 640px) { .flow { grid-template-columns: 1fr 1fr; } }
+.flow div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; position: relative; }
+.flow b { display: block; font-size: 14px; }
+.flow span { color: var(--muted); font-size: 12.5px; }
+.flow div:not(:last-child)::after { content: "\2192"; position: absolute; right: -9px; top: 50%; transform: translateY(-50%);
+  color: var(--accent); font-weight: 700; background: var(--bg); border-radius: 50%; width: 16px; text-align: center; line-height: 16px; font-size: 12px; }
+@media (max-width: 640px) { .flow div::after { display: none; } }
+
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.b-ok { background: var(--ok-bg); color: var(--ok); } .b-bad { background: var(--bad-bg); color: var(--bad); }
+.b-warn { background: var(--warn-bg); color: var(--warn); } .b-mut { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+
+.check { list-style: none; padding: 0; }
+.check li { padding-left: 28px; position: relative; }
+.check li::before { content: ""; position: absolute; left: 2px; top: 5px; width: 14px; height: 14px; border: 2px solid var(--accent); border-radius: 4px; }
+footer { color: var(--muted); font-size: 13px; text-align: center; padding: 10px 20px 40px; }
+@media print {
+  nav.toc, .copy { display: none; } .wrap { display: block; } section { break-inside: avoid; border: 0; padding: 8px 0; }
+  header.hero { border: 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <div class="eyebrow">COBOL Test Automation Kit &middot; v0.1</div>
+    <h1>Getting Started Guide</h1>
+    <p class="lede">From zero to a compiled COBOL program, a full test run and an HTML test report in about 10 minutes.
+      Then learn how to plug in your own program, tests and compiler.</p>
+    <div class="quick">
+      <span class="chip">Python 3 standard library only</span>
+      <span class="chip">GnuCOBOL (cobc)</span>
+      <span class="chip">Runs on localhost</span>
+      <span class="chip">Works offline</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <p>Contents</p>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#prereq">1. Prerequisites</a></li>
+      <li><a href="#get">2. Get the project</a></li>
+      <li><a href="#start">3. Start the app</a></li>
+      <li><a href="#configure">4. Configure &amp; validate</a></li>
+      <li><a href="#run">5. Run the tests</a></li>
+      <li><a href="#results">6. Read the results</a></li>
+      <li><a href="#report">7. Open the report</a></li>
+      <li><a href="#own">8. Use your own program</a></li>
+      <li><a href="#tests">9. Write test cases</a></li>
+      <li><a href="#compiler">10. Change the compiler</a></li>
+      <li><a href="#cli">11. Command line</a></li>
+      <li><a href="#claude">12. Claude Code skill</a></li>
+      <li><a href="#trouble">Troubleshooting</a></li>
+      <li><a href="#safety">Safety notes</a></li>
+      <li><a href="#checklist">First-run checklist</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <h2>Overview</h2>
+      <p class="sub">What the kit does, end to end.</p>
+      <div class="flow" aria-label="Workflow">
+        <div><b>Configure</b><span>Compiler, flags, paths, timeouts in <code>config/kit.config.json</code></span></div>
+        <div><b>Build</b><span>Compiles your COBOL source with the configured compiler</span></div>
+        <div><b>Test</b><span>Feeds each test's input on stdin and compares the output</span></div>
+        <div><b>Report</b><span>Results page plus a standalone, printable HTML report</span></div>
+      </div>
+      <p>Every result shown comes from real process output: exit codes, stdout, stderr. A test that did not execute is shown as
+        <span class="badge b-mut">NOT RUN</span>, never as <span class="badge b-ok">PASS</span>.</p>
+    </section>
+
+    <section id="prereq">
+      <h2><span class="num">1</span>Prerequisites</h2>
+      <p class="sub">You need Python 3 and, to actually compile COBOL, GnuCOBOL.</p>
+      <div class="code"><span class="label">Check what you have</span><button class="copy" type="button">Copy</button>
+<pre>python3 --version
+cobc --version</pre></div>
+      <h3>Install GnuCOBOL (only if <code>cobc</code> is missing)</h3>
+      <div class="tablewrap"><table>
+        <tr><th>System</th><th>Command</th></tr>
+        <tr><td>macOS (Homebrew)</td><td><code>brew install gnucobol</code></td></tr>
+        <tr><td>Debian / Ubuntu</td><td><code>sudo apt install gnucobol</code></td></tr>
+        <tr><td>Fedora</td><td><code>sudo dnf install gnucobol</code></td></tr>
+      </table></div>
+      <div class="callout tip"><b>No compiler yet?</b>The app still starts. Validation will clearly report
+        <em>"Compiler 'cobc' not found"</em> and runs will show the build as an error with every test NOT RUN.</div>
+      <p>There are no Python packages to install. The kit uses only the standard library.</p>
+    </section>
+
+    <section id="get">
+      <h2><span class="num">2</span>Get the project</h2>
+      <p class="sub">Open a terminal in the project folder.</p>
+      <div class="code"><button class="copy" type="button">Copy</button>
+<pre>cd /path/to/Claude_Cobol</pre></div>
+      <p>Key folders:</p>
+      <div class="tablewrap"><table>
+        <tr><th>Path</th><th>What it holds</th></tr>
+        <tr><td><code>app/</code></td><td>Config, compiler adapters, process runner, test runner, report, web server, CLI</td></tr>
+        <tr><td><code>static/</code></td><td>The Configuration and Results pages</td></tr>
+        <tr><td><code>config/</code></td><td><code>kit.config.example.json</code>; your local <code>kit.config.json</code> is created on first start</td></tr>
+        <tr><td><code>samples/</code></td><td>Synthetic COBOL program <code>PREMCALC.cbl</code> and its test cases</td></tr>
+        <tr><td><code>tests/</code></td><td>The kit's own automated tests</td></tr>
+        <tr><td><code>runs/ build/ reports/</code></td><td>Created at runtime (git-ignored)</td></tr>
+      </table></div>
+    </section>
+
+    <section id="start">
+      <h2><span class="num">3</span>Start the app</h2>
+      <div class="code"><span class="label">Terminal</span><button class="copy" type="button">Copy</button>
+<pre>python3 -m app</pre></div>
+      <p>You should see:</p>
+      <div class="code"><pre>COBOL Test Automation Kit running
+  Configuration: http://127.0.0.1:8765/config
+  Results:       http://127.0.0.1:8765/results
+Press Ctrl+C to stop.</pre></div>
+      <p>Open <a href="http://127.0.0.1:8765/config">http://127.0.0.1:8765/config</a> in your browser.</p>
+      <div class="callout tip"><b>Port already used?</b>Start on another port: <code>python3 -m app serve --port 9000</code></div>
+    </section>
+
+    <section id="configure">
+      <h2><span class="num">4</span>Configure &amp; validate</h2>
+      <p class="sub">The defaults already point to the sample program, so you can just validate.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Field</th><th>Default</th><th>Meaning</th></tr>
+        <tr><td>Compiler adapter</td><td><code>gnucobol</code></td><td>How the build command is assembled</td></tr>
+        <tr><td>Compiler executable</td><td><code>cobc</code></td><td>Name on PATH or a full path</td></tr>
+        <tr><td>Compiler flags</td><td><code>-x -free -Wall</code></td><td>Executable, free-format source, all warnings</td></tr>
+        <tr><td>Source directory / file</td><td><code>samples/src</code> / <code>PREMCALC.cbl</code></td><td>The program under test</td></tr>
+        <tr><td>Build directory</td><td><code>build</code></td><td>Where the executable is written</td></tr>
+        <tr><td>Test cases file</td><td><code>samples/tests/premcalc_tests.json</code></td><td>Test definitions (JSON)</td></tr>
+        <tr><td>Report directory</td><td><code>reports</code></td><td>Where HTML reports are written</td></tr>
+        <tr><td>Timeouts</td><td>60 s compile, 5 s per test</td><td>Processes are killed when they exceed them</td></tr>
+      </table></div>
+      <ol>
+        <li>Click <b>Validate configuration</b>. This checks paths, the compiler and the test file <em>without running anything</em>.</li>
+        <li>The <b>Validation</b> panel lists each check as <span class="badge b-ok">OK</span>, <span class="badge b-warn">WARN</span> or <span class="badge b-bad">ERROR</span>.
+          WARN for the build/report folders just means "will be created on first run".</li>
+        <li>If you changed anything, click <b>Save configuration</b>. Runs always use the <em>saved</em> config, and the page warns you about unsaved changes.</li>
+      </ol>
+      <div class="callout warn"><b>Paths must stay inside the project folder.</b>Relative paths are resolved from the project root.
+        Anything resolving outside it (e.g. <code>../other</code>) is rejected. Paths with spaces are fine.</div>
+    </section>
+
+    <section id="run">
+      <h2><span class="num">5</span>Run the tests</h2>
+      <p>Click <b>Run tests</b> on the Configuration page (or <b>Run again</b> on the Results page). The kit will:</p>
+      <ol>
+        <li>Validate the saved configuration.</li>
+        <li>Delete its own previous build of the program, so a failed compile can never run an old binary.</li>
+        <li>Compile, e.g. <code>cobc -x -free -Wall -o build/PREMCALC samples/src/PREMCALC.cbl</code>.</li>
+        <li>Run each enabled test: send <code>input</code> + newline on stdin, capture stdout/stderr/exit code, compare.</li>
+        <li>Save the run to <code>runs/&lt;run_id&gt;.json</code> and write <code>reports/report-&lt;run_id&gt;.html</code>.</li>
+      </ol>
+      <p>A progress banner shows the current step. Expected result for the sample:</p>
+      <div class="callout ok"><b>PASSED WITH SKIPS: 14 passed, 0 failed, 0 errors, 1 not run (15 total)</b>
+        <code>TC-014</code> is disabled on purpose to show how a pending business rule appears as NOT RUN.</div>
+    </section>
+
+    <section id="results">
+      <h2><span class="num">6</span>Read the results</h2>
+      <p>The Results page shows the latest run (pick older ones in <b>Run history</b>):</p>
+      <ul>
+        <li><b>Run summary:</b> run ID, start/end time, compiler version, platform, and counts.</li>
+        <li><b>Compilation:</b> status, exit code, exact command, and expandable compiler stdout/stderr.</li>
+        <li><b>Test cases:</b> ID, description, input, expected vs actual, status, duration, and the reason for any failure.</li>
+        <li><b>Program output per test:</b> raw stdout/stderr of every executed test.</li>
+      </ul>
+      <h3>Status meanings</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Test status</th><th>Meaning</th></tr>
+        <tr><td><span class="badge b-ok">PASS</span></td><td>Executed and every comparison matched</td></tr>
+        <tr><td><span class="badge b-bad">FAIL</span></td><td>Executed, but output or exit code differed from expected</td></tr>
+        <tr><td><span class="badge b-bad">ERROR</span></td><td>Timed out or could not start</td></tr>
+        <tr><td><span class="badge b-mut">NOT RUN</span></td><td>Disabled in the test file, or the build failed</td></tr>
+      </table></div>
+      <div class="tablewrap"><table>
+        <tr><th>Overall status</th><th>When</th></tr>
+        <tr><td><span class="badge b-ok">PASSED</span></td><td>Every test executed and passed</td></tr>
+        <tr><td><span class="badge b-warn">PASSED WITH SKIPS</span></td><td>No failures, but some tests were not run</td></tr>
+        <tr><td><span class="badge b-bad">FAILED</span></td><td>At least one FAIL or ERROR</td></tr>
+        <tr><td><span class="badge b-bad">BUILD FAILED</span></td><td>Compilation failed or the compiler could not run</td></tr>
+        <tr><td><span class="badge b-warn">NO TESTS RUN</span></td><td>Build succeeded but nothing executed</td></tr>
+        <tr><td><span class="badge b-bad">ERROR</span></td><td>Setup problem (missing source, invalid test file)</td></tr>
+      </table></div>
+    </section>
+
+    <section id="report">
+      <h2><span class="num">7</span>Open the HTML report</h2>
+      <p>Click <b>Open HTML report</b> on the Results page. The report is a single file in <code>reports/</code> with
+        the run and environment info, configuration summary, counts, compiler output, the full test table,
+        failure diagnostics and a list of limitations / tests not executed.</p>
+      <ul>
+        <li>Print it or use <b>Save as PDF</b> from the browser; print styles are built in.</li>
+        <li>It loads nothing from the internet and contains no scripts; all program output is escaped.</li>
+        <li>Local paths are shortened to <code>&lt;project&gt;</code> and <code>~</code>.</li>
+      </ul>
+      <p>An example is included: <a href="sample-report.html">docs/sample-report.html</a> (labelled SAMPLE).</p>
+    </section>
+
+    <section id="own">
+      <h2><span class="num">8</span>Use your own COBOL program</h2>
+      <ol>
+        <li>Put your source in a folder inside the project, e.g. <code>myprog/src/CLAIMCHK.cbl</code>.</li>
+        <li>Make sure the program follows the <b>stdin &rarr; stdout</b> interface: read its input with <code>ACCEPT</code>,
+          print results with <code>DISPLAY</code>, and set <code>RETURN-CODE</code> for error exit codes.</li>
+        <li>Create a test file, e.g. <code>myprog/tests/claimchk_tests.json</code> (see next step).</li>
+        <li>On the Configuration page set <b>Source directory</b> <code>myprog/src</code>, <b>Source file</b> <code>CLAIMCHK.cbl</code>,
+          <b>Test cases file</b> <code>myprog/tests/claimchk_tests.json</code>.</li>
+        <li>Fixed-format source? Change the flags from <code>-x -free -Wall</code> to <code>-x -Wall</code> (or <code>-x -fixed -Wall</code>).</li>
+        <li><b>Save</b>, <b>Validate</b>, then <b>Run tests</b>.</li>
+      </ol>
+      <div class="callout warn"><b>Public repository?</b>Use only synthetic programs and data. Never commit employer/client code,
+        credentials or proprietary configuration.</div>
+    </section>
+
+    <section id="tests">
+      <h2><span class="num">9</span>Write test cases</h2>
+      <div class="code"><span class="label">myprog/tests/claimchk_tests.json</span><button class="copy" type="button">Copy</button>
+<pre>{
+  "suite": "CLAIMCHK validation",
+  "default_timeout_seconds": 5,
+  "tests": [
+    {
+      "id": "TC-001",
+      "category": "normal",
+      "description": "Valid claim is accepted",
+      "input": "C1001,250.00",
+      "expected": { "stdout": "STATUS=ACCEPTED", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-002",
+      "category": "invalid",
+      "description": "Negative amount is rejected",
+      "input": "C1002,-5",
+      "expected": { "stdout": "ERR", "exit_code": 4 },
+      "compare": "contains"
+    },
+    {
+      "id": "TC-003",
+      "category": "normal",
+      "description": "Rule waiting for business confirmation",
+      "input": "C1003,9999.99",
+      "expected": { "stdout": "STATUS=REVIEW" },
+      "compare": "exact",
+      "enabled": false,
+      "skip_reason": "Threshold not confirmed yet"
+    }
+  ]
+}</pre></div>
+      <div class="tablewrap"><table>
+        <tr><th>Field</th><th>Required</th><th>Notes</th></tr>
+        <tr><td><code>id</code></td><td>yes</td><td>Unique; letters, digits, <code>_ - .</code> (max 40)</td></tr>
+        <tr><td><code>description</code></td><td>yes</td><td>Shown in results and report</td></tr>
+        <tr><td><code>input</code></td><td>no</td><td>Sent to stdin with a newline appended</td></tr>
+        <tr><td><code>expected.stdout</code></td><td>for exact / contains / regex</td><td>Text, substring or regular expression</td></tr>
+        <tr><td><code>expected.exit_code</code></td><td>for exit_code</td><td>If set, also checked in every other mode</td></tr>
+        <tr><td><code>compare</code></td><td>no (default exact)</td><td><code>exact</code>, <code>contains</code>, <code>regex</code>, <code>exit_code</code></td></tr>
+        <tr><td><code>timeout_seconds</code></td><td>no</td><td>Overrides the default timeout</td></tr>
+        <tr><td><code>enabled</code>, <code>skip_reason</code></td><td>no</td><td><code>false</code> &rarr; NOT RUN with the reason shown</td></tr>
+        <tr><td><code>category</code></td><td>no</td><td>Free text, e.g. normal / boundary / invalid / regression</td></tr>
+      </table></div>
+      <p><b>Output normalisation before comparing:</b> CRLF &rarr; LF, trailing spaces removed on each line (COBOL <code>DISPLAY</code> padding),
+        leading/trailing blank lines dropped.</p>
+      <div class="callout tip"><b>Good practice</b>Derive expected values from the business rules, not by copying the program's output.
+        Cover normal, boundary, invalid and regression cases.</div>
+    </section>
+
+    <section id="compiler">
+      <h2><span class="num">10</span>Change the compiler (no code changes)</h2>
+      <h3>Another GnuCOBOL installation</h3>
+      <p>Set <b>Compiler executable</b> to the full path, e.g. <code>/opt/gnucobol-3.2/bin/cobc</code>, then Save and Validate.</p>
+      <h3>Any other command-line compiler: the <code>generic</code> adapter</h3>
+      <p>Select adapter <code>generic</code> and write the complete flags, using the placeholders
+        <code>{source}</code> and <code>{output}</code> as whole arguments:</p>
+      <div class="code"><span class="label">Compiler flags field</span><button class="copy" type="button">Copy</button>
+<pre>-x -free -o {output} {source}</pre></div>
+      <p>The flags field is split like a shell command line (quotes group words: <code>-I "copy books"</code>), but it is
+        <b>never run through a shell</b>: no variables, wildcards, pipes or <code>;</code>.</p>
+      <p>A very different build process (JCL submit, multi-step link, DB2 precompile) needs a new adapter class in
+        <code>app/compilers.py</code>: implement <code>check_args</code> and <code>build_command</code> and register it in <code>ADAPTERS</code>.</p>
+    </section>
+
+    <section id="cli">
+      <h2><span class="num">11</span>Command line (no browser)</h2>
+      <div class="code"><button class="copy" type="button">Copy</button>
+<pre>python3 -m app validate          <span class="cmt"># check config, paths, compiler, test file (runs nothing)</span>
+python3 -m app run               <span class="cmt"># build + test with the saved config, write the report</span>
+python3 -m app report RUN_ID     <span class="cmt"># re-render the report of a recorded run</span>
+python3 -m app report RUN_ID --sample --out docs/my-sample.html</pre></div>
+      <p><code>python3 -m app run</code> exits with <code>0</code> for PASSED / PASSED WITH SKIPS and <code>1</code> otherwise, so it fits in CI.</p>
+      <h3>Run the kit's own tests</h3>
+      <div class="code"><button class="copy" type="button">Copy</button>
+<pre>python3 -m unittest discover -s tests -t . -v</pre></div>
+      <p>Tests that need GnuCOBOL are skipped automatically when <code>cobc</code> is not installed.</p>
+    </section>
+
+    <section id="claude">
+      <h2><span class="num">12</span>Use the Claude Code skill</h2>
+      <p>The project includes <code>.claude/skills/cobol-test-workflow/SKILL.md</code>. Start Claude Code in the project root and ask, for example:</p>
+      <div class="code"><span class="label">Inside Claude Code</span><button class="copy" type="button">Copy</button>
+<pre>/cobol-test-workflow Explain PREMCALC, propose missing boundary tests for vehicle value,
+then run the suite and summarize the results with evidence.</pre></div>
+      <p>The skill makes Claude:</p>
+      <ul>
+        <li>run only the documented commands and read the real run records;</li>
+        <li>label proposed tests as <b>confirmed</b> (you stated the rule) or <b>inferred</b> (derived from code);</li>
+        <li>never change expected values, disable tests or edit COBOL to hide failures; fixes are proposed for your review.</li>
+      </ul>
+    </section>
+
+    <section id="trouble">
+      <h2>Troubleshooting</h2>
+      <div class="tablewrap"><table>
+        <tr><th>Symptom</th><th>Fix</th></tr>
+        <tr><td>"Compiler 'cobc' not found"</td><td>Install GnuCOBOL or enter the full path to <code>cobc</code>.</td></tr>
+        <tr><td>BUILD FAILED with format errors</td><td>Flags don't match the source format: <code>-free</code> for free format, <code>-fixed</code> or none for fixed.</td></tr>
+        <tr><td><code>libcob</code> errors when tests run</td><td>Compiler/runtime mismatch. Check with <code>cobc --info</code>.</td></tr>
+        <tr><td>Test ERROR "Timed out"</td><td>The program waits for more input or loops. Check the stdin protocol; raise <code>timeout_seconds</code> only if it is genuinely slow.</td></tr>
+        <tr><td>"resolves outside the project directory"</td><td>Keep all paths inside the project folder.</td></tr>
+        <tr><td>"You have unsaved changes"</td><td>Click Save configuration (runs use the saved config) or Discard changes.</td></tr>
+        <tr><td>403 "Host not allowed"</td><td>Open the app via <code>127.0.0.1</code> or <code>localhost</code>.</td></tr>
+        <tr><td>Port 8765 in use</td><td><code>python3 -m app serve --port 9000</code></td></tr>
+      </table></div>
+    </section>
+
+    <section id="safety">
+      <h2>Safety notes</h2>
+      <ul>
+        <li>Intended for <b>local, trusted, single-user</b> use. It binds to <code>127.0.0.1</code> by default. Do not deploy it as a public server.</li>
+        <li>There is no endpoint that runs arbitrary commands; processes are started from argument lists with timeouts.</li>
+        <li>Whoever can edit the config chooses the compiler executable. Treat the config as trusted input.</li>
+        <li>The kit never edits your COBOL source or expected results to make tests pass.</li>
+      </ul>
+    </section>
+
+    <section id="checklist">
+      <h2>First-run checklist</h2>
+      <ul class="check">
+        <li>Start the app with <code>python3 -m app</code> and open the Configuration page.</li>
+        <li>Validate; if GnuCOBOL is missing, confirm the app says so clearly.</li>
+        <li>Run the sample tests; expect 14 passed and 1 not run.</li>
+        <li>Open the Results page and the HTML report.</li>
+        <li>Change an expected value in the test file, run again, and confirm it stays <span class="badge b-bad">FAIL</span>. Then revert it.</li>
+        <li>Change the compiler executable or flags, save, and confirm the new command is used.</li>
+        <li>Add screenshots and a demo GIF to the README before sharing.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<footer>COBOL Test Automation Kit &middot; Getting Started Guide &middot; sample code and data are synthetic</footer>
+
+<script>
+  document.querySelectorAll(".code").forEach(function (block) {
+    var button = block.querySelector(".copy");
+    if (!button) return;
+    button.addEventListener("click", function () {
+      var text = block.querySelector("pre").innerText;
+      var done = function (label) { button.textContent = label; setTimeout(function () { button.textContent = "Copy"; }, 1500); };
+      if (navigator.clipboard && window.isSecureContext !== false) {
+        navigator.clipboard.writeText(text).then(function () { done("Copied"); }, function () { done("Select & copy"); });
+      } else {
+        done("Select & copy");
+      }
+    });
+  });
+</script>
+</body>
+</html>

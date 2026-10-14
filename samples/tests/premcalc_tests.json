@@ -1,0 +1,129 @@
+{
+  "suite": "PREMCALC premium calculation (synthetic demo)",
+  "description": "Expected values were calculated by hand from the rules documented in samples/src/PREMCALC.cbl, not copied from program output.",
+  "default_timeout_seconds": 5,
+  "tests": [
+    {
+      "id": "TC-001",
+      "category": "normal",
+      "description": "Standard driver, no claims",
+      "input": "35,20000,0",
+      "expected": { "stdout": "RESULT=OK PREMIUM=700.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-002",
+      "category": "normal",
+      "description": "Standard driver with 3 claims; checks rounding",
+      "input": "33,12345,3",
+      "expected": { "stdout": "RESULT=OK PREMIUM=710.97", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-003",
+      "category": "normal",
+      "description": "Young driver (factor 1.50) with 1 claim",
+      "input": "22,10000,1",
+      "expected": { "stdout": "RESULT=OK PREMIUM=825.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-004",
+      "category": "boundary",
+      "description": "Minimum age and minimum vehicle value",
+      "input": "18,1000,0",
+      "expected": { "stdout": "RESULT=OK PREMIUM=480.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-005",
+      "category": "boundary",
+      "description": "Maximum age, maximum vehicle value, maximum accepted claims (5)",
+      "input": "99,200000,5",
+      "expected": { "stdout": "RESULT=OK PREMIUM=7740.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-006",
+      "category": "boundary",
+      "description": "Age 64 is the last age in the standard band",
+      "input": "64,20000,0",
+      "expected": { "stdout": "RESULT=OK PREMIUM=700.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-007",
+      "category": "boundary",
+      "description": "Age 65 is the first age in the senior band (factor 1.20)",
+      "input": "65,20000,0",
+      "expected": { "stdout": "RESULT=OK PREMIUM=840.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-008",
+      "category": "boundary",
+      "description": "6 claims is declined",
+      "input": "35,20000,6",
+      "expected": { "stdout": "RESULT=DECLINED REASON=TOO-MANY-CLAIMS", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-009",
+      "category": "invalid",
+      "description": "Age below minimum is rejected",
+      "input": "17,20000,0",
+      "expected": { "stdout": "CODE=E03", "exit_code": 4 },
+      "compare": "contains"
+    },
+    {
+      "id": "TC-010",
+      "category": "invalid",
+      "description": "Non-numeric age is rejected",
+      "input": "abc,20000,0",
+      "expected": { "stdout": "CODE=E02", "exit_code": 4 },
+      "compare": "contains"
+    },
+    {
+      "id": "TC-011",
+      "category": "invalid",
+      "description": "Vehicle value below minimum is rejected",
+      "input": "35,999,0",
+      "expected": { "stdout": "^RESULT=ERROR CODE=E05 MSG=.+$", "exit_code": 4 },
+      "compare": "regex"
+    },
+    {
+      "id": "TC-012",
+      "category": "invalid",
+      "description": "Missing field is rejected",
+      "input": "35,20000",
+      "expected": { "stdout": "CODE=E01", "exit_code": 4 },
+      "compare": "contains"
+    },
+    {
+      "id": "TC-013",
+      "category": "invalid",
+      "description": "Empty input line is rejected",
+      "input": "",
+      "expected": { "exit_code": 4 },
+      "compare": "exit_code"
+    },
+    {
+      "id": "REG-001",
+      "category": "regression",
+      "description": "Age 25 must use the standard factor 1.00, not the young-driver factor (guards against an off-by-one in the age band)",
+      "input": "25,20000,0",
+      "expected": { "stdout": "RESULT=OK PREMIUM=700.00", "exit_code": 0 },
+      "compare": "exact"
+    },
+    {
+      "id": "TC-014",
+      "category": "normal",
+      "description": "Multi-vehicle discount (business rule not confirmed yet)",
+      "input": "35,20000,0",
+      "expected": { "stdout": "RESULT=OK PREMIUM=665.00", "exit_code": 0 },
+      "compare": "exact",
+      "enabled": false,
+      "skip_reason": "Rule not implemented in PREMCALC; waiting for business confirmation"
+    }
+  ]
+}

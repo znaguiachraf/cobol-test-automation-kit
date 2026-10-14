@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configuration - COBOL Test Automation Kit</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">COBOL Test Automation Kit <span>local developer tool</span></div>
+    <nav class="nav" aria-label="Main">
+      <a href="/config" aria-current="page">Configuration</a>
+      <a href="/results">Results</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Configuration</h1>
+    <p class="lead">Compiler, paths and test settings. Saved to <code id="config-file">config/kit.config.json</code>;
+      paths are relative to the project folder and must stay inside it.</p>
+
+    <div class="layout">
+      <form id="config-form" class="card" novalidate>
+        <div id="form-message" hidden></div>
+
+        <fieldset>
+          <legend>Compiler</legend>
+          <div class="grid2">
+            <div class="field">
+              <label for="adapter">Compiler adapter</label>
+              <select id="adapter" name="adapter" aria-describedby="adapter-hint"></select>
+              <span class="hint" id="adapter-hint"></span>
+            </div>
+            <div class="field">
+              <label for="executable">Compiler executable or path</label>
+              <input id="executable" name="executable" class="mono" required autocomplete="off" spellcheck="false"
+                     aria-describedby="executable-hint">
+              <span class="hint" id="executable-hint">Name on PATH (e.g. <code>cobc</code>) or full path.</span>
+            </div>
+            <div class="field wide">
+              <label for="args">Compiler flags</label>
+              <input id="args" name="args" class="mono" autocomplete="off" spellcheck="false" aria-describedby="args-hint">
+              <span class="hint" id="args-hint">Split like a POSIX shell (quotes group words), but never run through a shell:
+                no variables, globbing or pipes. GnuCOBOL adds <code>-o &lt;output&gt; &lt;source&gt;</code> itself;
+                the generic adapter needs <code>{source}</code> and usually <code>{output}</code>.</span>
+            </div>
+            <div class="field">
+              <label for="compile_timeout">Compile timeout (seconds)</label>
+              <input id="compile_timeout" name="compile_timeout" type="number" min="1" max="3600" required>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Source and output paths</legend>
+          <div class="grid2">
+            <div class="field">
+              <label for="source_dir">Source directory</label>
+              <input id="source_dir" name="source_dir" class="mono" required spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="source_file">Source file / program</label>
+              <input id="source_file" name="source_file" class="mono" required spellcheck="false"
+                     aria-describedby="source-file-hint">
+              <span class="hint" id="source-file-hint">Relative to the source directory.</span>
+            </div>
+            <div class="field">
+              <label for="build_dir">Build / output directory</label>
+              <input id="build_dir" name="build_dir" class="mono" required spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="report_dir">Report output directory</label>
+              <input id="report_dir" name="report_dir" class="mono" required spellcheck="false">
+            </div>
+            <div class="field wide">
+              <label for="tests_file">Test cases file (JSON)</label>
+              <input id="tests_file" name="tests_file" class="mono" required spellcheck="false">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Test execution</legend>
+          <div class="grid2">
+            <div class="field">
+              <label for="test_timeout">Default test timeout (seconds)</label>
+              <input id="test_timeout" name="test_timeout" type="number" min="1" max="3600" required
+                     aria-describedby="test-timeout-hint">
+              <span class="hint" id="test-timeout-hint">Used when a test case has no timeout of its own.</span>
+            </div>
+            <div class="field">
+              <label for="max_output">Max captured output (bytes)</label>
+              <input id="max_output" name="max_output" type="number" min="1024" max="10485760" required>
+            </div>
+            <div class="field wide">
+              <label for="project_name">Project name (shown in reports)</label>
+              <input id="project_name" name="project_name" required>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="primary" id="save-btn">Save configuration</button>
+          <button type="button" id="validate-btn">Validate configuration</button>
+          <button type="button" id="run-btn">Run tests</button>
+          <button type="button" id="reset-btn">Discard changes</button>
+        </div>
+        <p class="statusline" id="save-state" aria-live="polite">Loading configuration...</p>
+      </form>
+
+      <aside>
+        <section class="card" aria-labelledby="checks-title">
+          <h2 id="checks-title">Validation</h2>
+          <p class="hint" id="checks-hint">Checks paths, the compiler executable and the test file. Nothing is compiled or executed.</p>
+          <ul class="checks" id="checks" aria-live="polite"></ul>
+        </section>
+        <section class="card" aria-labelledby="saved-title">
+          <h2 id="saved-title">Saved build command</h2>
+          <p class="hint">Argument list built from the saved configuration (preview).</p>
+          <pre class="mono" id="command-preview">-</pre>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <script src="/static/common.js"></script>
+  <script src="/static/config.js"></script>
+</body>
+</html>

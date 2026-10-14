@@ -1,0 +1,23 @@
+# Run artifacts
+build/
+runs/
+reports/
+
+# Local configuration (copied from config/kit.config.example.json on first start)
+config/kit.config.json
+config/.kit-config-*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Private planning document (not part of the tool)
+claude_code_cobol_test_automation_prompt.pdf

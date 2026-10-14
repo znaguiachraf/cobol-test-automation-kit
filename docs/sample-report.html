@@ -1,0 +1,57 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>SAMPLE - Test report 20261014-132444-7d67</title><style>
+:root{--fg:#1d2433;--muted:#5d6678;--line:#d9dee7;--bg:#ffffff;--panel:#f5f7fa;
+--ok:#116329;--ok-bg:#dafbe1;--bad:#a40e26;--bad-bg:#ffe1e4;--warn:#7a4d00;--warn-bg:#fff1c2;--accent:#0b5cad}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:32px 20px 48px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;margin:32px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+h3{font-size:14px;margin:16px 0 6px}
+.sub{color:var(--muted);margin:0}
+.sample{border:2px dashed var(--warn);background:var(--warn-bg);color:var(--warn);padding:10px 14px;border-radius:6px;font-weight:600;margin-bottom:16px}
+.hero{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.stat{flex:1 1 120px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.stat span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;vertical-align:top;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{background:var(--panel);font-weight:600}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:0}dt{color:var(--muted)}dd{margin:0;word-break:break-word}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;margin:4px 0;white-space:pre-wrap;word-break:break-word;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+td pre{margin:0;padding:6px}
+code{font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.ok{background:var(--ok-bg);color:var(--ok)}.bad{background:var(--bad-bg);color:var(--bad)}
+.warn{background:var(--warn-bg);color:var(--warn)}.muted{color:var(--muted)}
+.badge.muted{background:var(--panel);border:1px solid var(--line)}
+.failure{border-left:4px solid var(--bad);padding:4px 12px;margin:12px 0}
+ul{margin:6px 0;padding-left:20px}
+footer{margin-top:40px;color:var(--muted);font-size:12px}
+@media print{main{padding:0;max-width:none}h2{break-after:avoid}tr,pre,.failure{break-inside:avoid}}
+</style></head><body><main><div class='sample'>SAMPLE REPORT - generated from a demo run of synthetic code and data. It is an example of the report format, not evidence for any real system.</div><h1>COBOL Test Automation Kit - Test Report</h1><p class='sub'>PREMCALC demo &middot; suite: PREMCALC premium calculation (synthetic demo)</p><p class='sub'>Run <code>20261014-132444-7d67</code> &middot; report generated 2026-10-14T13:24:53+00:00</p><div class='hero'><div class='stat'><span>Overall</span><b><span class="badge warn">PASSED WITH SKIPS</span></b></div><div class='stat'><span>Total</span><b>15</b></div><div class='stat'><span>Passed</span><b>14</b></div><div class='stat'><span>Failed</span><b>0</b></div><div class='stat'><span>Errors</span><b>0</b></div><div class='stat'><span>Not run</span><b>1</b></div></div><h2>Run and environment</h2><dl><dt>Started</dt><dd>2026-10-14T13:24:44+00:00</dd><dt>Ended</dt><dd>2026-10-14T13:24:44+00:00</dd><dt>Tool version</dt><dd>0.1.0</dd><dt>Platform</dt><dd>macOS-26.6.2-arm64-arm-64bit-Mach-O</dd><dt>Python</dt><dd>3.13.3</dd><dt>Compiler</dt><dd>cobc (GnuCOBOL) 3.2.0</dd></dl><h2>Configuration summary</h2><dl><dt>Adapter</dt><dd>gnucobol</dd><dt>Compiler executable</dt><dd>cobc</dd><dt>Compiler arguments</dt><dd>-x -free -Wall</dd><dt>Compile timeout</dt><dd>60 s</dd><dt>Source</dt><dd>samples/src/PREMCALC.cbl</dd><dt>Tests file</dt><dd>samples/tests/premcalc_tests.json</dd><dt>Build directory</dt><dd>build</dd><dt>Default test timeout</dt><dd>5 s</dd></dl><h2>Compilation</h2><dl><dt>Status</dt><dd><span class="badge ok">SUCCESS</span></dd><dt>Exit code</dt><dd>0</dd><dt>Duration</dt><dd>188 ms</dd><dt>Command</dt><dd><code>/opt/homebrew/bin/cobc -x -free -Wall -o &lt;project&gt;/build/PREMCALC &lt;project&gt;/samples/src/PREMCALC.cbl</code></dd></dl><h3>Compiler stdout</h3><p class="muted">(empty)</p><h3>Compiler stderr</h3><p class="muted">(empty)</p><h2>Test cases</h2><table><thead><tr><th>ID</th><th>Description</th><th>Input</th><th>Expected</th><th>Actual</th><th>Status</th><th>Time</th></tr></thead><tbody><tr><td><code>TC-001</code></td><td>Standard driver, no claims<br><span class='muted'>normal</span></td><td><pre>35,20000,0</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=700.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=700.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>505 ms</td></tr><tr><td><code>TC-002</code></td><td>Standard driver with 3 claims; checks rounding<br><span class='muted'>normal</span></td><td><pre>33,12345,3</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=710.97
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=710.97
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>24 ms</td></tr><tr><td><code>TC-003</code></td><td>Young driver (factor 1.50) with 1 claim<br><span class='muted'>normal</span></td><td><pre>22,10000,1</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=825.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=825.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>22 ms</td></tr><tr><td><code>TC-004</code></td><td>Minimum age and minimum vehicle value<br><span class='muted'>boundary</span></td><td><pre>18,1000,0</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=480.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=480.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>11 ms</td></tr><tr><td><code>TC-005</code></td><td>Maximum age, maximum vehicle value, maximum accepted claims (5)<br><span class='muted'>boundary</span></td><td><pre>99,200000,5</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=7740.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=7740.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>11 ms</td></tr><tr><td><code>TC-006</code></td><td>Age 64 is the last age in the standard band<br><span class='muted'>boundary</span></td><td><pre>64,20000,0</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=700.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=700.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>11 ms</td></tr><tr><td><code>TC-007</code></td><td>Age 65 is the first age in the senior band (factor 1.20)<br><span class='muted'>boundary</span></td><td><pre>65,20000,0</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=840.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=840.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>TC-008</code></td><td>6 claims is declined<br><span class='muted'>boundary</span></td><td><pre>35,20000,6</pre></td><td><pre>stdout [exact]: RESULT=DECLINED REASON=TOO-MANY-CLAIMS
+exit code: 0</pre></td><td><pre>RESULT=DECLINED REASON=TOO-MANY-CLAIMS
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>TC-009</code></td><td>Age below minimum is rejected<br><span class='muted'>invalid</span></td><td><pre>17,20000,0</pre></td><td><pre>stdout [contains]: CODE=E03
+exit code: 4</pre></td><td><pre>RESULT=ERROR CODE=E03 MSG=AGE OUT OF RANGE 18-99
+exit code: 4</pre></td><td><span class="badge ok">PASS</span></td><td>11 ms</td></tr><tr><td><code>TC-010</code></td><td>Non-numeric age is rejected<br><span class='muted'>invalid</span></td><td><pre>abc,20000,0</pre></td><td><pre>stdout [contains]: CODE=E02
+exit code: 4</pre></td><td><pre>RESULT=ERROR CODE=E02 MSG=AGE MUST BE A NUMBER
+exit code: 4</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>TC-011</code></td><td>Vehicle value below minimum is rejected<br><span class='muted'>invalid</span></td><td><pre>35,999,0</pre></td><td><pre>stdout [regex]: ^RESULT=ERROR CODE=E05 MSG=.+$
+exit code: 4</pre></td><td><pre>RESULT=ERROR CODE=E05 MSG=VEHICLE VALUE OUT OF RANGE 1000-200000
+exit code: 4</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>TC-012</code></td><td>Missing field is rejected<br><span class='muted'>invalid</span></td><td><pre>35,20000</pre></td><td><pre>stdout [contains]: CODE=E01
+exit code: 4</pre></td><td><pre>RESULT=ERROR CODE=E01 MSG=EXPECTED 3 COMMA-SEPARATED FIELDS
+exit code: 4</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>TC-013</code></td><td>Empty input line is rejected<br><span class='muted'>invalid</span></td><td><pre></pre></td><td><pre>exit code: 4</pre></td><td><pre>RESULT=ERROR CODE=E01 MSG=EXPECTED 3 COMMA-SEPARATED FIELDS
+exit code: 4</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>REG-001</code></td><td>Age 25 must use the standard factor 1.00, not the young-driver factor (guards against an off-by-one in the age band)<br><span class='muted'>regression</span></td><td><pre>25,20000,0</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=700.00
+exit code: 0</pre></td><td><pre>RESULT=OK PREMIUM=700.00
+exit code: 0</pre></td><td><span class="badge ok">PASS</span></td><td>10 ms</td></tr><tr><td><code>TC-014</code></td><td>Multi-vehicle discount (business rule not confirmed yet)<br><span class='muted'>normal</span></td><td><pre>35,20000,0</pre></td><td><pre>stdout [exact]: RESULT=OK PREMIUM=665.00
+exit code: 0</pre></td><td><pre>-</pre></td><td><span class="badge muted">NOT RUN</span></td><td>-</td></tr></tbody></table><h2>Failures and diagnostics</h2><p>No failed or errored tests in this run.</p><h2>Limitations and tests not executed</h2><ul><li>1 test(s) were not run; they are not counted as passed.</li><li><code>TC-014</code> not run: Disabled in test file: Rule not implemented in PREMCALC; waiting for business confirmation</li><li>Results show only what the test cases check. Expected values and business rules require human review; a passing run does not prove the program is correct.</li></ul><footer>Generated by COBOL Test Automation Kit from the recorded run data in runs/20261014-132444-7d67.json. Local paths are shortened to &lt;project&gt; and ~.</footer></main></body></html>
