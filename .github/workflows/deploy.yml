@@ -145,5 +145,5 @@ jobs:
           {
             echo "### COBOL test site"
             echo "- Run: \`${RUN_ID:-not run}\` - **${STATUS:-n/a}**"
-            [ -n "$SITE_URL" ] && echo "- Site: $SITE_URL"
+            if [ -n "$SITE_URL" ]; then echo "- Site: $SITE_URL"; fi
           } >> "$GITHUB_STEP_SUMMARY"
