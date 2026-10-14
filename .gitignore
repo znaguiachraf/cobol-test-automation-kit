@@ -21,3 +21,6 @@ venv/
 
 # Private planning document (not part of the tool)
 claude_code_cobol_test_automation_prompt.pdf
+
+# Static website export (python3 -m app export)
+site/

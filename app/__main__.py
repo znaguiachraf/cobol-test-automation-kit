@@ -5,13 +5,14 @@
     python3 -m app validate              validate the saved configuration (runs no compiler)
     python3 -m app run                   build + test with the saved configuration, write report
     python3 -m app report RUN_ID [--sample --out FILE]   re-render the report of a recorded run
+    python3 -m app export [--out DIR]    write the static website (history, reports, tests, source)
 """
 
 import argparse
 import ipaddress
 import sys
 
-from . import TOOL_NAME, config as config_mod, report, service, store
+from . import TOOL_NAME, config as config_mod, report, service, site, store
 
 
 def cmd_validate(_args):
@@ -57,6 +58,18 @@ def cmd_report(args):
     return 0
 
 
+def cmd_export(args):
+    cfg = config_mod.load_config()
+    out = config_mod.resolve_in_root(config_mod.PROJECT_ROOT, args.out)
+    if out is None or out == config_mod.PROJECT_ROOT:
+        print("--out must be a folder inside the project directory", file=sys.stderr)
+        return 1
+    runs = [store.load_run(r["run_id"]) for r in store.list_runs(limit=site.MAX_RUNS)]
+    site.export_site([r for r in runs if r], cfg, out)
+    print(f"Static site written: {out} ({len(runs)} run(s))")
+    return 0
+
+
 def cmd_serve(args):
     from .server import make_server
     try:
@@ -93,11 +106,14 @@ def main(argv=None):
     rep.add_argument("run_id")
     rep.add_argument("--sample", action="store_true", help="label the report as a SAMPLE")
     rep.add_argument("--out", help="output file inside the project (default: report dir)")
+    exp = sub.add_parser("export", help="write the static website for publishing")
+    exp.add_argument("--out", default="site", help="output folder inside the project (default: site)")
     args = parser.parse_args(argv)
     if args.command is None:
         args = parser.parse_args(["serve"])
     try:
-        return {"serve": cmd_serve, "validate": cmd_validate, "run": cmd_run, "report": cmd_report}[args.command](args)
+        return {"serve": cmd_serve, "validate": cmd_validate, "run": cmd_run, "report": cmd_report,
+                "export": cmd_export}[args.command](args)
     except config_mod.ConfigError as exc:
         print("Configuration error:\n  " + "\n  ".join(exc.errors), file=sys.stderr)
         return 2

@@ -1,0 +1,82 @@
+name: deploy site
+
+# Builds and tests the COBOL program with real GnuCOBOL, renders the static site
+# (python -m app export) and uploads it to shared hosting over FTPS.
+# Setup: see "Publish online" in README.md.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install GnuCOBOL
+        run: sudo apt-get update && sudo apt-get install -y gnucobol
+
+      - name: Restore run history from the published site
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          python - <<'EOF'
+          import json, os, sys, urllib.request
+          from app.store import RUNS_DIR, valid_run_id
+          base = os.environ.get("SITE_URL", "").rstrip("/")
+          if not base:
+              print("SITE_URL not set: starting with an empty history")
+              sys.exit(0)
+          def get(path):
+              with urllib.request.urlopen(f"{base}/{path}", timeout=20) as r:
+                  return json.loads(r.read().decode("utf-8"))
+          try:
+              ids = get("data/index.json")["runs"]
+          except Exception as exc:
+              print(f"No published history yet ({exc}): starting empty")
+              sys.exit(0)
+          RUNS_DIR.mkdir(exist_ok=True)
+          restored = 0
+          for run_id in ids:
+              if not valid_run_id(run_id):
+                  continue
+              try:
+                  run = get(f"data/runs/{run_id}.json")
+              except Exception as exc:
+                  print(f"skip {run_id}: {exc}")
+                  continue
+              if run.get("run_id") == run_id:
+                  (RUNS_DIR / f"{run_id}.json").write_text(json.dumps(run), "utf-8")
+                  restored += 1
+          print(f"Restored {restored} run(s)")
+          EOF
+
+      - name: Kit unit and integration tests
+        run: python -m unittest discover -s tests -t . -v
+
+      - name: Build and run the COBOL test suite
+        # A failing suite is still published (as FAILED); it is never hidden.
+        run: |
+          python -m app validate
+          python -m app run || echo "::warning::COBOL test suite did not pass; publishing the result anyway"
+
+      - name: Export static site
+        run: python -m app export --out site
+
+      - name: Upload to shared hosting (FTPS)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          protocol: ftps
+          local-dir: ./site/

@@ -162,6 +162,43 @@ The rules are documented in the header of [`samples/src/PREMCALC.cbl`](samples/s
 Expected values in the sample suite were computed by hand from those rules. `TC-014` is
 deliberately disabled, to show how a pending business rule appears as `NOT RUN`.
 
+## Publish online (static, shared hosting)
+
+The results can be published as a **read-only static website** on any plain web hosting,
+including cPanel/PHP shared hosting. GitHub Actions compiles and tests the program with real
+GnuCOBOL, and the site is uploaded over FTPS. The site shows the latest result, the run
+history (last 50 runs), every full report, the test cases and the COBOL source.
+
+```bash
+python3 -m app export --out site     # write the site locally (preview: python3 -m http.server -d site)
+```
+
+The site is plain HTML with inline CSS only. It has no scripts and no server code, and it
+loads nothing remotely. Local paths are shortened to `<project>` and `~`. An `.htaccess` file
+sets a strict Content-Security-Policy and turns off directory listings on Apache.
+
+**Live runs are deliberately not offered online.** Shared hosting cannot run Python or
+`cobc`. Also, a public "run" button would let anyone choose the program the server executes
+(the compiler is configurable). Every build runs in CI instead.
+
+### Setup (once)
+
+1. In cPanel, open *FTP Accounts* and create an account limited to a folder, for example
+   `public_html/cobol/`.
+2. In GitHub, open *Settings → Secrets and variables → Actions* and add these **secrets**:
+   - `FTP_SERVER`, e.g. `ftp.yourdomain.com`
+   - `FTP_USERNAME`
+   - `FTP_PASSWORD`
+   - `FTP_SERVER_DIR`, which is the folder relative to that FTP account's home, ending with `/`.
+     Use `./` if the account is already limited to the target folder.
+3. Add the **variable** `SITE_URL`, e.g. `https://yourdomain.com/cobol`. CI downloads the
+   published history from there, so it carries over from run to run.
+4. Open *Actions → deploy site → Run workflow*. After that, the site updates on every push to `main`.
+
+A failing COBOL suite is still published, with its real status (`FAILED`, `BUILD_FAILED`, ...).
+If your host doesn't support FTPS, change `protocol: ftps` to `ftp` in
+`.github/workflows/deploy.yml`. Plain FTP sends the password unencrypted.
+
 ## Claude Code integration
 
 `.claude/skills/cobol-test-workflow/SKILL.md` tells Claude Code how to:
@@ -234,15 +271,15 @@ This v1 is for **local, trusted, single-user** use. It is not a multi-user or pu
 ## Project layout
 
 ```
-app/            config, compiler adapters, process runner, test runner, report, server, CLI
+app/            config, compiler adapters, process runner, test runner, report, static site, server, CLI
 static/         Configuration and Results pages (HTML/CSS/JS)
 config/         kit.config.example.json (kit.config.json is local and git-ignored)
 samples/        synthetic COBOL program and test cases
 tests/          unittest suite
 docs/           getting-started guide, sample report
-.github/        CI: unit tests + sample run on Ubuntu with GnuCOBOL
+.github/        CI: unit tests + sample run on Ubuntu with GnuCOBOL; deploy of the static site
 .claude/skills/ Claude Code skill
-runs/ build/ reports/   generated at runtime (git-ignored)
+runs/ build/ reports/ site/   generated at runtime (git-ignored)
 ```
 
 ## License
