@@ -2,7 +2,10 @@ name: deploy site
 
 # Builds and tests the COBOL program with real GnuCOBOL, renders the static site
 # (python -m app export) and uploads it to shared hosting over FTPS.
-# Setup: see "Publish online" in README.md.
+#
+# Settings (Settings -> Secrets and variables -> Actions, or scripts/setup-deploy.sh):
+#   secrets   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD, FTP_SERVER_DIR
+#   variables SITE_URL (required), FTP_PROTOCOL (ftps | ftp, default ftps), FTP_PORT (default 21)
 
 on:
   push:
@@ -13,10 +16,39 @@ concurrency:
   group: deploy
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
     steps:
+      - name: Check deploy settings
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          FTP_PROTOCOL: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+        run: |
+          missing=""
+          for name in FTP_SERVER FTP_USERNAME FTP_PASSWORD FTP_SERVER_DIR SITE_URL; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing deploy settings:$missing. Run scripts/setup-deploy.sh or add them in Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+          case "$FTP_SERVER_DIR" in */) ;; *) echo "::error::FTP_SERVER_DIR must end with '/' (use ./ for the FTP account's home)"; exit 1 ;; esac
+          case "$SITE_URL" in https://*|http://*) ;; *) echo "::error::SITE_URL must start with https://"; exit 1 ;; esac
+          case "$FTP_PROTOCOL" in ftps|ftp) ;; *) echo "::error::FTP_PROTOCOL must be ftps or ftp"; exit 1 ;; esac
+          [ "$FTP_PROTOCOL" = ftp ] && echo "::warning::FTP_PROTOCOL=ftp sends the password unencrypted"
+          echo "Deploy settings complete (protocol: $FTP_PROTOCOL)"
+
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
@@ -63,20 +95,55 @@ jobs:
         run: python -m unittest discover -s tests -t . -v
 
       - name: Build and run the COBOL test suite
+        id: suite
         # A failing suite is still published (as FAILED); it is never hidden.
         run: |
           python -m app validate
-          python -m app run || echo "::warning::COBOL test suite did not pass; publishing the result anyway"
+          python -m app run | tee run.log || echo "::warning::COBOL test suite did not pass; publishing the result anyway"
+          echo "run_id=$(sed -n 's/^Run \([0-9a-f-]*\): .*/\1/p' run.log)" >> "$GITHUB_OUTPUT"
+          echo "status=$(sed -n 's/^Run [0-9a-f-]*: \(.*\)/\1/p' run.log)" >> "$GITHUB_OUTPUT"
 
       - name: Export static site
         run: python -m app export --out site
 
-      - name: Upload to shared hosting (FTPS)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Upload to shared hosting
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          protocol: ftps
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          port: ${{ vars.FTP_PORT || 21 }}
           local-dir: ./site/
+
+      - name: Check the live site
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          RUN_ID: ${{ steps.suite.outputs.run_id }}
+        run: |
+          base="${SITE_URL%/}"
+          for attempt in 1 2 3; do
+            if curl -fsS "$base/data/index.json" | grep -q "\"$RUN_ID\""; then
+              echo "Live site shows run $RUN_ID"
+              break
+            fi
+            [ "$attempt" = 3 ] && { echo "::error::$base/data/index.json does not list run $RUN_ID. Check FTP_SERVER_DIR and SITE_URL point to the same folder."; exit 1; }
+            sleep 10
+          done
+          curl -fsS -o /dev/null "$base/index.html" || { echo "::error::$base/index.html is not reachable"; exit 1; }
+          curl -sSI "$base/index.html" | grep -qi '^content-security-policy:' \
+            || echo "::warning::No Content-Security-Policy header: the host ignores .htaccess (pages are still script-free)"
+
+      - name: Summary
+        if: always()
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          RUN_ID: ${{ steps.suite.outputs.run_id }}
+          STATUS: ${{ steps.suite.outputs.status }}
+        run: |
+          {
+            echo "### COBOL test site"
+            echo "- Run: \`${RUN_ID:-not run}\` - **${STATUS:-n/a}**"
+            [ -n "$SITE_URL" ] && echo "- Site: $SITE_URL"
+          } >> "$GITHUB_STEP_SUMMARY"

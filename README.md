@@ -185,19 +185,26 @@ sets a strict Content-Security-Policy and turns off directory listings on Apache
 
 1. In cPanel, open *FTP Accounts* and create an account limited to a folder, for example
    `public_html/cobol/`.
-2. In GitHub, open *Settings → Secrets and variables → Actions* and add these **secrets**:
-   - `FTP_SERVER`, e.g. `ftp.yourdomain.com`
-   - `FTP_USERNAME`
-   - `FTP_PASSWORD`
-   - `FTP_SERVER_DIR`, which is the folder relative to that FTP account's home, ending with `/`.
-     Use `./` if the account is already limited to the target folder.
-3. Add the **variable** `SITE_URL`, e.g. `https://yourdomain.com/cobol`. CI downloads the
-   published history from there, so it carries over from run to run.
-4. Open *Actions → deploy site → Run workflow*. After that, the site updates on every push to `main`.
+2. Run `scripts/setup-deploy.sh` in your terminal. It needs the GitHub CLI, logged in with
+   `gh auth login`. It asks for the values below, stores them in GitHub (the password is
+   never echoed), and starts the first deploy. You can also add them by hand in
+   *Settings → Secrets and variables → Actions*.
 
+   | Name | Kind | Value |
+   |---|---|---|
+   | `FTP_SERVER` | secret | e.g. `ftp.yourdomain.com` |
+   | `FTP_USERNAME` | secret | e.g. `deploy@yourdomain.com` |
+   | `FTP_PASSWORD` | secret | the FTP account's password |
+   | `FTP_SERVER_DIR` | secret | folder relative to the FTP account's home, ending in `/`; `./` if the account is limited to the target folder |
+   | `SITE_URL` | variable | e.g. `https://yourdomain.com/cobol`; CI reads the published history from here |
+   | `FTP_PROTOCOL` | variable | `ftps` (default) or `ftp`, only if the host has no FTPS (sends the password unencrypted) |
+   | `FTP_PORT` | variable | default `21` |
+
+3. Watch the run in *Actions → deploy site*. After that, the site updates on every push to `main`.
+
+The workflow first checks that every setting is present. After uploading, it checks that the
+live site lists the new run, so a wrong folder or URL fails the run instead of passing silently.
 A failing COBOL suite is still published, with its real status (`FAILED`, `BUILD_FAILED`, ...).
-If your host doesn't support FTPS, change `protocol: ftps` to `ftp` in
-`.github/workflows/deploy.yml`. Plain FTP sends the password unencrypted.
 
 ## Claude Code integration
 
@@ -276,6 +283,7 @@ static/         Configuration and Results pages (HTML/CSS/JS)
 config/         kit.config.example.json (kit.config.json is local and git-ignored)
 samples/        synthetic COBOL program and test cases
 tests/          unittest suite
+scripts/        setup-deploy.sh: store the hosting settings in GitHub and start a deploy
 docs/           getting-started guide, sample report
 .github/        CI: unit tests + sample run on Ubuntu with GnuCOBOL; deploy of the static site
 .claude/skills/ Claude Code skill
