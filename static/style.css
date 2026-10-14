@@ -169,7 +169,8 @@ details pre {
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
 
 /* Results page: narrower history column so the test table gets the room */
-.layout.results { grid-template-columns: minmax(0, 1fr) 250px; }
+.layout.results { grid-template-columns: minmax(0, 1fr) 270px; }
+.history button { flex-wrap: wrap; align-items: center; row-gap: 4px; }
 @media (max-width: 900px) { .layout.results { grid-template-columns: 1fr; } }
 td:first-child code { white-space: nowrap; }
 #notes .msg { margin: 16px 0 0; }
