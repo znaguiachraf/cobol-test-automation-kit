@@ -22,8 +22,8 @@ and needs no network access. The bundled sample (`PREMCALC`) and its data are **
 
 | Requirement | Notes |
 |---|---|
-| Python 3 | Standard library only. Tested only with Python 3.13. |
-| GnuCOBOL (`cobc`) | Optional for starting the app, required to compile the sample. Developed with GnuCOBOL 3.2. |
+| Python 3.10+ | Standard library only. Tested in CI with 3.10, 3.12 and 3.13. |
+| GnuCOBOL (`cobc`) | Optional for starting the app, required to compile the sample. Tested with GnuCOBOL 3.1.2 (Ubuntu CI) and 3.2 (macOS). |
 
 Install GnuCOBOL: Debian/Ubuntu `sudo apt install gnucobol`, Fedora `sudo dnf install gnucobol`,
 macOS `brew install gnucobol`. Without it, the app still starts and reports
@@ -228,8 +228,8 @@ This v1 is for **local, trusted, single-user** use. It is not a multi-user or pu
   program is run as the compiler. Do not expose this tool to untrusted users.
 - The tool never edits COBOL source or expected results to "fix" failures.
 - Limitations: one program per configuration, stdin/stdout programs only (no file or
-  database fixtures yet), one run at a time, no pre/post-build steps in v1. Windows is
-  untested; it was developed on macOS, and Linux is the main target.
+  database fixtures yet), one run at a time, no pre/post-build steps in v1. Tested on
+  Linux (Ubuntu, in CI) and macOS; Windows is untested.
 
 ## Project layout
 
